@@ -292,4 +292,69 @@ window.addEventListener('DOMContentLoaded', () => {
  
     //после создания карточек через JS, удаляем их из файла html
 
+
+//053 Forms. Реализация скрипта отправки данных на сервер с использование объекта XMLHttpRequest
+    // Сначала создаем файл backEnd - server.php
+    const forms = document.querySelectorAll('form'); //получение всех форм по тегу "form"
+    const message = { //создаем объект с различными свойствами - сообщениями
+       loading: 'Загрузка',
+       success: 'Спасибо! Скоро мы с вами свяжемся',
+       failure: 'Что то пошло не так...'
+    };
+
+    forms.forEach(item => { //под каждую форму подвязываем функцию postDate
+        postData(item);
+    });
+
+
+
+    function postData(form) { //функция постинга данных
+        form.addEventListener('submit', (e) => { //событие submit срабатывает каждый раз когда мы пытаемся отправить форму
+//по умолчанию браузер всегда перезагружает страницу при нажатии на клавишу с тегом btn 
+        e.preventDefault(); //отмена перезагрузки страницы при нажатии на кнопки Перезвонить мне
+
+        const statusMessage = document.createElement('div'); //создаем элемент с сообщением
+        statusMessage.classList.add('status');
+        statusMessage.textContent = message.loading; //После нажатия на кнопку выйдет сообщение Загрузка
+        form.append(statusMessage); //добавить к форме текстовое поле
+
+
+        const request = new XMLHttpRequest(); //создаем объект
+        request.open('POST', 'server.php'); //вызываем метод open для настройки запроса
+        //Отправка данных с форм в двух разных форматах:
+        //1) formData
+        //2) JSON
+        //Заголовок в данном случае (formData+XMLHttpRequest), при отправке форм устанавливать не нужно!!!
+        //request.setRequestHeader('Content-type', 'multipart/form-data');
+        //2) Для JSON нужен заголовок request.setRequestHeader('Content-type', 'application/json');
+        
+        const formData = new FormData(form); //1)formData
+//Для сбора информации с форм с помощью formData, 
+//необходимо чтобы у форм в верстке был всегда атбрибут name
+
+        /* 2) //Превращение объекта formData в формат JSON
+        formData специфический объект и просто так мы не можем его прогнать в другой формат
+        const object ={}; 
+        formData.forEach(function(value, key){ перебор formData и помещение данных в object
+            object[key] = value;
+        });
+        На данном этапе получили обычный объект (object), а не formData
+        const json = JSON.stringify(object);  //превращение объекта в JSON */
+
+        request.send(formData); //метод для отправки
+        //request.send(json); //2) для JSON
+        request.addEventListener('load', () => {  //load - конечная загрузка запроса
+            if (request.status === 200) {
+                console.log(request.response);
+                statusMessage.textContent = message.success; //Сообщение об упехе
+                form.reset(); //Очистка формы
+                setTimeout(() => { //удалить блок с сообщение через 2 сек.
+                    statusMessage.remove();
+                }, 2000);
+            } else {
+                statusMessage.textContent = message.failure; //сообщение об ошибке
+            }
+        }) 
+        });
+    }
 });
