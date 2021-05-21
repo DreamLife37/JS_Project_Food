@@ -121,8 +121,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Триггер для модального окна это будет кнопка "Связаться с Нами"
     const modalTrigger = document.querySelectorAll('[data-modal]'), //атрибут прописывается в квадратных скобках. Находим кнопки.
-        modal = document.querySelector('.modal'), //переменная отвечающая за само модальное окно
-        modalCloseBtn = document.querySelector('[data-close]'); //кнопка отвечающая за закрытие окна
+        modal = document.querySelector('.modal'); //переменная отвечающая за само модальное окно
+    //После создания мод. модального окна в 054, обработчик события работать с таким элементами не будет,
+    //тк элемент создан динамически с помощью JS. Удаляем переменную modalCloseBtn
+        //  modalCloseBtn = document.querySelector('[data-close]'); //кнопка отвечающая за закрытие окна
 
 
 
@@ -139,6 +141,24 @@ window.addEventListener('DOMContentLoaded', () => {
        });   */
 
 
+       modalTrigger.forEach(btn => {
+        btn.addEventListener('click', openModal);
+    });
+
+       function closeModal() {
+        modal.classList.add('hide');
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function openModal() {
+        modal.classList.add('show');
+        modal.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimerId);
+    }
+
+/* 
     // второй способ вызова модального окна, с помощью переключения класса:
     modalTrigger.forEach(btn => { //необходимо кнопки перебрать тк мы не можем на псевдомассив повесить обработчик события
         //перебор также нужен и для первого способа, чтобы повесить обработчик события на все кнопки
@@ -156,11 +176,16 @@ window.addEventListener('DOMContentLoaded', () => {
         modal.classList.toggle('show'); // класс уже есть у окна, те при нажатии на кнопку класс удалится.
         document.body.style.overflow = ''; //при закрытии модального окна, восстановить скрол страницы
     }
-
-    modalCloseBtn.addEventListener('click', closeModal); //обратная операция, при нажатии на крестить в модальном окне, оно закрывается
+ */
+    //тк в 054 создаем элемент динамически, на нем не будет работать обработчик события
+    //modalCloseBtn.addEventListener('click', closeModal); //обратная операция, при нажатии на крестить в модальном окне, оно закрывается
 
     modal.addEventListener('click', (e) => { //e.target это то, куда кликнул пользователь
-        if (e.target === modal) { //при клике в подложку (modal) окно также закрывается
+        //в 054 создаем динамически элемент, для его закрытия добавляем:
+        //e.target.getAttribute('data-close')
+        if (e.target === modal || e.target.getAttribute('data-close') == '') { //при клике в подложку (modal) окно также закрывается
+            //e.target === modal - клик на подложку
+            //e.target.getAttribute('data-close') - клик на крести в окне
             closeModal(); // в данном случае пишем со скобками, те условие выполнилось, функция выполняется
         }
     });
@@ -297,7 +322,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Сначала создаем файл backEnd - server.php
     const forms = document.querySelectorAll('form'); //получение всех форм по тегу "form"
     const message = { //создаем объект с различными свойствами - сообщениями
-       loading: 'Загрузка',
+       //loading: 'Загрузка',
+       loading: 'img/form/spinner.svg',
        success: 'Спасибо! Скоро мы с вами свяжемся',
        failure: 'Что то пошло не так...'
     };
@@ -313,10 +339,15 @@ window.addEventListener('DOMContentLoaded', () => {
 //по умолчанию браузер всегда перезагружает страницу при нажатии на клавишу с тегом btn 
         e.preventDefault(); //отмена перезагрузки страницы при нажатии на кнопки Перезвонить мне
 
-        const statusMessage = document.createElement('div'); //создаем элемент с сообщением
-        statusMessage.classList.add('status');
-        statusMessage.textContent = message.loading; //После нажатия на кнопку выйдет сообщение Загрузка
-        form.append(statusMessage); //добавить к форме текстовое поле
+        let statusMessage = document.createElement('img'); //создаем элемент с сообщением
+        statusMessage.src = message.loading;
+        //statusMessage.textContent = message.loading; //После нажатия на кнопку выйдет сообщение Загрузка
+        statusMessage.style.cssText = `
+        display: block;
+        margin: 0 auto;
+        `;
+        //form.append(statusMessage); //добавить к форме текстовое поле
+        form.insertAdjacentElement('afterend', statusMessage);
 
 
         const request = new XMLHttpRequest(); //создаем объект
@@ -324,37 +355,67 @@ window.addEventListener('DOMContentLoaded', () => {
         //Отправка данных с форм в двух разных форматах:
         //1) formData
         //2) JSON
-        //Заголовок в данном случае (formData+XMLHttpRequest), при отправке форм устанавливать не нужно!!!
+        //Заголовок в случае (formData+XMLHttpRequest), при отправке форм устанавливать не нужно!!!
         //request.setRequestHeader('Content-type', 'multipart/form-data');
         //2) Для JSON нужен заголовок request.setRequestHeader('Content-type', 'application/json');
+        request.setRequestHeader('Content-type', 'application/json');
         
-        const formData = new FormData(form); //1)formData
+        const formData = new FormData(form); //formData
 //Для сбора информации с форм с помощью formData, 
 //необходимо чтобы у форм в верстке был всегда атбрибут name
 
-        /* 2) //Превращение объекта formData в формат JSON
-        formData специфический объект и просто так мы не можем его прогнать в другой формат
+         //Превращение объекта formData в формат JSON
+        //formData специфический объект и просто так мы не можем его прогнать в другой формат
         const object ={}; 
-        formData.forEach(function(value, key){ перебор formData и помещение данных в object
+        formData.forEach(function(value, key){ //перебор formData и помещение данных в object
             object[key] = value;
         });
-        На данном этапе получили обычный объект (object), а не formData
-        const json = JSON.stringify(object);  //превращение объекта в JSON */
+        //На данном этапе получили обычный объект (object), а не formData
+        const json = JSON.stringify(object);  //превращение объекта в JSON 
 
-        request.send(formData); //метод для отправки
-        //request.send(json); //2) для JSON
+        //request.send(formData); //метод для отправки 1)formData
+        request.send(json); //2) для JSON
         request.addEventListener('load', () => {  //load - конечная загрузка запроса
             if (request.status === 200) {
                 console.log(request.response);
-                statusMessage.textContent = message.success; //Сообщение об упехе
+                showThanksModal(message.success); //Сообщение об упехе
+                 //setTimeout(() => { //удалить блок с сообщение через 2 сек. 
+                statusMessage.remove();
                 form.reset(); //Очистка формы
-                setTimeout(() => { //удалить блок с сообщение через 2 сек.
-                    statusMessage.remove();
-                }, 2000);
+                //}, 2000); 
             } else {
-                statusMessage.textContent = message.failure; //сообщение об ошибке
+                showThanksModal(message.failure); //сообщение об ошибке
             }
-        }) 
+        }); 
         });
     }
+
+//054.Красивое оповещение пользователя.
+//После отправки формы с обратной связью пользователю будет выходить окно с благодарностью
+function showThanksModal(message) {
+    const prevModalDialog = document.querySelector('.modal__dialog'); //находим модальное окно
+
+    prevModalDialog.classList.add('hide'); //скрытие модального окна с контентом
+    openModal(); //открытие модального окна
+
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog'); //добавление класса новому окну, чтобы он нормально выглядел
+    //формирование верстки модального окна
+    thanksModal.innerHTML = `
+      <div class="modal__content">
+        <div class="modal__close" data-close>×</div>
+        <div class="modal__title">${message}</div>
+      </div>
+    `;
+    //Убираем переменную modalCloseBtn и назначение обработчика события modalCloseBtn.addEventListener('click', closeModal);
+    document.querySelector('.modal').append(thanksModal);
+    setTimeout(() => {
+        thanksModal.remove(); //удалить окно с благодарностью
+        prevModalDialog.classList.add('show');
+        prevModalDialog.classList.remove('hide');
+        closeModal();
+    }, 1000);
+
+}
+
 });
