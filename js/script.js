@@ -124,7 +124,7 @@ window.addEventListener('DOMContentLoaded', () => {
         modal = document.querySelector('.modal'); //переменная отвечающая за само модальное окно
     //После создания мод. модального окна в 054, обработчик события работать с таким элементами не будет,
     //тк элемент создан динамически с помощью JS. Удаляем переменную modalCloseBtn
-        //  modalCloseBtn = document.querySelector('[data-close]'); //кнопка отвечающая за закрытие окна
+    //  modalCloseBtn = document.querySelector('[data-close]'); //кнопка отвечающая за закрытие окна
 
 
 
@@ -141,11 +141,11 @@ window.addEventListener('DOMContentLoaded', () => {
        });   */
 
 
-       modalTrigger.forEach(btn => {
+    modalTrigger.forEach(btn => {
         btn.addEventListener('click', openModal);
     });
 
-       function closeModal() {
+    function closeModal() {
         modal.classList.add('hide');
         modal.classList.remove('show');
         document.body.style.overflow = '';
@@ -158,25 +158,25 @@ window.addEventListener('DOMContentLoaded', () => {
         clearInterval(modalTimerId);
     }
 
-/* 
-    // второй способ вызова модального окна, с помощью переключения класса:
-    modalTrigger.forEach(btn => { //необходимо кнопки перебрать тк мы не можем на псевдомассив повесить обработчик события
-        //перебор также нужен и для первого способа, чтобы повесить обработчик события на все кнопки
-        btn.addEventListener('click', openModal); //при клике на кнопку "Связаться с нами" выходит модальное окно
-    });
+    /* 
+        // второй способ вызова модального окна, с помощью переключения класса:
+        modalTrigger.forEach(btn => { //необходимо кнопки перебрать тк мы не можем на псевдомассив повесить обработчик события
+            //перебор также нужен и для первого способа, чтобы повесить обработчик события на все кнопки
+            btn.addEventListener('click', openModal); //при клике на кнопку "Связаться с нами" выходит модальное окно
+        });
 
-    //если какой то участок кода повтораяется два и более раз, то его необходимо вынести в отдельную функцию
-    function openModal() {
-        modal.classList.toggle('show'); //переключить класс show (тк класса еще нет, то он его автоматически допишет)
-        document.body.style.overflow = 'hidden'; //запрет прокрутки страницы при открытом модальном окне
-        clearInterval(modalTimerId); //очищаем и останавливаем таймер, если пользователь сам уже открывал модальное окно.
-    }
+        //если какой то участок кода повтораяется два и более раз, то его необходимо вынести в отдельную функцию
+        function openModal() {
+            modal.classList.toggle('show'); //переключить класс show (тк класса еще нет, то он его автоматически допишет)
+            document.body.style.overflow = 'hidden'; //запрет прокрутки страницы при открытом модальном окне
+            clearInterval(modalTimerId); //очищаем и останавливаем таймер, если пользователь сам уже открывал модальное окно.
+        }
 
-    function closeModal() { //функция закрытия модального окна
-        modal.classList.toggle('show'); // класс уже есть у окна, те при нажатии на кнопку класс удалится.
-        document.body.style.overflow = ''; //при закрытии модального окна, восстановить скрол страницы
-    }
- */
+        function closeModal() { //функция закрытия модального окна
+            modal.classList.toggle('show'); // класс уже есть у окна, те при нажатии на кнопку класс удалится.
+            document.body.style.overflow = ''; //при закрытии модального окна, восстановить скрол страницы
+        }
+     */
     //тк в 054 создаем элемент динамически, на нем не будет работать обработчик события
     //modalCloseBtn.addEventListener('click', closeModal); //обратная операция, при нажатии на крестить в модальном окне, оно закрывается
 
@@ -217,7 +217,7 @@ window.addEventListener('DOMContentLoaded', () => {
     //Задание 048. Используем классы для карточек
 
     //Создаем шаблон (класс), чтобы от него отпачковывать карточки
-    class MenuCard {  //название класса всегда с большой буквы
+    class MenuCard { //название класса всегда с большой буквы
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
             //прописываем свойства
             this.src = src; //источник картинки
@@ -239,22 +239,23 @@ window.addEventListener('DOMContentLoaded', () => {
             this.price = this.price * this.transfer; // (цена придет на как аргумент*на курс конвертации)
         }
 
-        render() { /*//создаем метод для вестки
-            1) создание элемента
-            2) в созданный элемент помещаем вестку (копируем из html файла)
-            3) верстку дополнить данными которые приходят как аргументы
-            4) поместить элемент на страницу */
+        render() {
+            /*//создаем метод для вестки
+                       1) создание элемента
+                       2) в созданный элемент помещаем вестку (копируем из html файла)
+                       3) верстку дополнить данными которые приходят как аргументы
+                       4) поместить элемент на страницу */
             const element = document.createElement('div');
             //classes (rest) всегда будет сформировывать массив, даже если мы не передадим аргумент, то массив будет пустой
             if (this.classes.length === 0) { //если кол-во элементов в массиве =0,то присваиваем стандартное значение
-            this.element = 'menu__item';
-            element.classList.add(this.element);
+                this.element = 'menu__item';
+                element.classList.add(this.element);
             } else {
                 this.classes.forEach(className => element.classList.add(className));
                 //мы обращаемся к element, к его classList и добавляем каждый класс который будет находится в массиве classes
             }
 
-            
+
             //из верстки убрали  <div class="menu__item"> после применения оператора rest
             element.innerHTML = `
                
@@ -273,8 +274,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     //Создание экземпляров класса:
-   /*  const div = new MenuCard();
-    div.render(); */
+    /*  const div = new MenuCard();
+     div.render(); */
 
     //альтернативная запись (сокращенная)
     //new MenuCard().render(); объект и метод используются на месте, те он нам что то сделает и исчезнет, тк на него нет ссылок
@@ -288,7 +289,7 @@ window.addEventListener('DOMContentLoaded', () => {
         9,
         '.menu .container',
         'menu__item',
-       
+
 
     ).render();
 
@@ -314,18 +315,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
     ).render();
 
- 
+
     //после создания карточек через JS, удаляем их из файла html
 
 
-//053 Forms. Реализация скрипта отправки данных на сервер с использование объекта XMLHttpRequest
+    //053 Forms. Реализация скрипта отправки данных на сервер с использование объекта XMLHttpRequest
     // Сначала создаем файл backEnd - server.php
     const forms = document.querySelectorAll('form'); //получение всех форм по тегу "form"
     const message = { //создаем объект с различными свойствами - сообщениями
-       //loading: 'Загрузка',
-       loading: 'img/form/spinner.svg',
-       success: 'Спасибо! Скоро мы с вами свяжемся',
-       failure: 'Что то пошло не так...'
+        //loading: 'Загрузка',
+        loading: 'img/form/spinner.svg',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что то пошло не так...'
     };
 
     forms.forEach(item => { //под каждую форму подвязываем функцию postDate
@@ -336,86 +337,128 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function postData(form) { //функция постинга данных
         form.addEventListener('submit', (e) => { //событие submit срабатывает каждый раз когда мы пытаемся отправить форму
-//по умолчанию браузер всегда перезагружает страницу при нажатии на клавишу с тегом btn 
-        e.preventDefault(); //отмена перезагрузки страницы при нажатии на кнопки Перезвонить мне
+            //по умолчанию браузер всегда перезагружает страницу при нажатии на клавишу с тегом btn 
+            e.preventDefault(); //отмена перезагрузки страницы при нажатии на кнопки Перезвонить мне
 
-        let statusMessage = document.createElement('img'); //создаем элемент с сообщением
-        statusMessage.src = message.loading;
-        //statusMessage.textContent = message.loading; //После нажатия на кнопку выйдет сообщение Загрузка
-        statusMessage.style.cssText = `
+            let statusMessage = document.createElement('img'); //создаем элемент с сообщением
+            statusMessage.src = message.loading;
+            //statusMessage.textContent = message.loading; //После нажатия на кнопку выйдет сообщение Загрузка
+            statusMessage.style.cssText = `
         display: block;
         margin: 0 auto;
         `;
-        //form.append(statusMessage); //добавить к форме текстовое поле
-        form.insertAdjacentElement('afterend', statusMessage);
+            //form.append(statusMessage); //добавить к форме текстовое поле
+            form.insertAdjacentElement('afterend', statusMessage);
 
 
-        const request = new XMLHttpRequest(); //создаем объект
-        request.open('POST', 'server.php'); //вызываем метод open для настройки запроса
-        //Отправка данных с форм в двух разных форматах:
-        //1) formData
-        //2) JSON
-        //Заголовок в случае (formData+XMLHttpRequest), при отправке форм устанавливать не нужно!!!
-        //request.setRequestHeader('Content-type', 'multipart/form-data');
-        //2) Для JSON нужен заголовок request.setRequestHeader('Content-type', 'application/json');
-        request.setRequestHeader('Content-type', 'application/json');
-        
-        const formData = new FormData(form); //formData
-//Для сбора информации с форм с помощью formData, 
-//необходимо чтобы у форм в верстке был всегда атбрибут name
+            /* Не неужно для Fetch (056)
+            const request = new XMLHttpRequest(); //создание объекта XMLHttpRequest
+            request.open('POST', 'server.php'); //вызываем метод open для настройки запроса */
 
-         //Превращение объекта formData в формат JSON
-        //formData специфический объект и просто так мы не можем его прогнать в другой формат
-        const object ={}; 
-        formData.forEach(function(value, key){ //перебор formData и помещение данных в object
-            object[key] = value;
-        });
-        //На данном этапе получили обычный объект (object), а не formData
-        const json = JSON.stringify(object);  //превращение объекта в JSON 
 
-        //request.send(formData); //метод для отправки 1)formData
-        request.send(json); //2) для JSON
-        request.addEventListener('load', () => {  //load - конечная загрузка запроса
-            if (request.status === 200) {
-                console.log(request.response);
+            //Отправка данных с форм в двух разных форматах:
+            //1) formData
+            //2) JSON
+            //Заголовок в случае (formData+XMLHttpRequest), при отправке форм устанавливать не нужно!!!
+            //request.setRequestHeader('Content-type', 'multipart/form-data');
+            //2) Для JSON нужен заголовок request.setRequestHeader('Content-type', 'application/json');
+
+            //request.setRequestHeader('Content-type', 'application/json'); 056 Fetch
+            //request.setRequestHeader(); //для Fetch заголовок перенесли 
+
+            const formData = new FormData(form); //formData
+            //Для сбора информации с форм с помощью formData, 
+            //необходимо чтобы у форм в верстке был всегда атбрибут name
+
+            /*  Не нужно для Fetch 056
+                   //Превращение объекта formData в формат JSON
+                   //formData специфический объект и просто так мы не можем его прогнать в другой формат
+                   const object ={}; 
+                   formData.forEach(function(value, key){ //перебор formData и помещение данных в object
+                       object[key] = value;
+                   });
+                   //На данном этапе получили обычный объект (object), а не formData
+                   const json = JSON.stringify(object);  //превращение объекта в JSON  */
+
+            //request.send(formData); //метод для отправки 1)formData
+            // Не нужно для Fetch 056: 
+            //request.send(json); //2) для JSON
+
+            fetch('server.php', {
+                method: 'POST',
+                /*  headers: {
+                     'Content-type': 'application/json' //ставим не запятую, а двоеточие
+                 }, */
+                body: formData
+            }).then(data => data.text()) //модификация ответа от сервера в обычный текст
+            .then(data => {
+                console.log(data); //вывод в консоль того, что вернул сервер
                 showThanksModal(message.success); //Сообщение об упехе
-                 //setTimeout(() => { //удалить блок с сообщение через 2 сек. 
                 statusMessage.remove();
+            }).catch(() => { //этот блок лучше всегда прописывать, чтобы обрабатывать ошибки
+                showThanksModal(message.failure);
+            }).finally(() => {
                 form.reset(); //Очистка формы
-                //}, 2000); 
-            } else {
-                showThanksModal(message.failure); //сообщение об ошибке
-            }
-        }); 
+            });
+
+            /*     Не нужно для Fetch 056
+            request.addEventListener('load', () => {  //load - конечная загрузка запроса
+                    if (request.status === 200) {
+                        console.log(request.response);
+                        showThanksModal(message.success); //Сообщение об упехе
+                         //setTimeout(() => { //удалить блок с сообщение через 2 сек. 
+                        statusMessage.remove();
+                        form.reset(); //Очистка формы
+                        //}, 2000); 
+                    } else {
+                        showThanksModal(message.failure); //сообщение об ошибке
+                    }
+                });  */
         });
     }
 
-//054.Красивое оповещение пользователя.
-//После отправки формы с обратной связью пользователю будет выходить окно с благодарностью
-function showThanksModal(message) {
-    const prevModalDialog = document.querySelector('.modal__dialog'); //находим модальное окно
+    //054.Красивое оповещение пользователя.
+    //После отправки формы с обратной связью пользователю будет выходить окно с благодарностью
+    function showThanksModal(message) {
+        const prevModalDialog = document.querySelector('.modal__dialog'); //находим модальное окно
 
-    prevModalDialog.classList.add('hide'); //скрытие модального окна с контентом
-    openModal(); //открытие модального окна
+        prevModalDialog.classList.add('hide'); //скрытие модального окна с контентом
+        openModal(); //открытие модального окна
 
-    const thanksModal = document.createElement('div');
-    thanksModal.classList.add('modal__dialog'); //добавление класса новому окну, чтобы он нормально выглядел
-    //формирование верстки модального окна
-    thanksModal.innerHTML = `
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog'); //добавление класса новому окну, чтобы он нормально выглядел
+        //формирование верстки модального окна
+        thanksModal.innerHTML = `
       <div class="modal__content">
         <div class="modal__close" data-close>×</div>
         <div class="modal__title">${message}</div>
       </div>
     `;
-    //Убираем переменную modalCloseBtn и назначение обработчика события modalCloseBtn.addEventListener('click', closeModal);
-    document.querySelector('.modal').append(thanksModal);
-    setTimeout(() => {
-        thanksModal.remove(); //удалить окно с благодарностью
-        prevModalDialog.classList.add('show');
-        prevModalDialog.classList.remove('hide');
-        closeModal();
-    }, 1000);
+        //Убираем переменную modalCloseBtn и назначение обработчика события modalCloseBtn.addEventListener('click', closeModal);
+        document.querySelector('.modal').append(thanksModal);
+        setTimeout(() => {
+            thanksModal.remove(); //удалить окно с благодарностью
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal();
+        }, 1000);
 
-}
+    }
+    /* 
+    //056. Fetch API (application programming interface)
+    Fetch это замена XMLHttpRequest
+    Самый банальный API это DOM API, по факту это различные методы (к примеру querySelector), которые позволяют нам работать с элементами на странице
+    Перепишем наш функционал проекта с использование Fetch.
+    //Fetch технология позволяющая общаться с сервером, построенная на Промисах
+    fetch('https://jsonplaceholder.typicode.com/posts', { //Из этой конструкции возвращается именно Промис. Настройки Fetch идут после url в формате объекта. Если эти настройки не указывать, то это будет обычный GET запрос.
+        method: 'POST',
+        body: JSON.stringify({name: 'Alex'}), //объект который будем отправлять
+        headers: { //заголовки
+               'Content-type': 'application/json'
+        }
+    })
+      .then(response => response.json()) //response - ответ.
+      //response.json() превращает json данные в самый обычный JS объект. Эта команда возвращает нам промис, тк мы не знаем как быстро наш json объект превратится в обычный объект, не знаем точного количества времени. Если все успешно прошло, то выполняется следующий then.
+      .then(json => console.log(json)); */
 
 });
