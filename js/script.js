@@ -216,6 +216,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Задание 048. Используем классы для карточек
 
+
+    //реализации карточек с классом (059 вер 1), для второго варианта не нужно
     //Создаем шаблон (класс), чтобы от него отпачковывать карточки
     class MenuCard { //название класса всегда с большой буквы
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -234,11 +236,9 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         //Создаем методы:
-
         changeToUAH() { //создаем метод конвертации валюты в гривну из USD
             this.price = this.price * this.transfer; // (цена придет на как аргумент*на курс конвертации)
         }
-
         render() {
             /*//создаем метод для вестки
                        1) создание элемента
@@ -257,6 +257,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
             //из верстки убрали  <div class="menu__item"> после применения оператора rest
+
+            //реализации карточек с классом (059 вер 1), для второго варианта не нужно
             element.innerHTML = `
                
                     <img src=${this.src} alt=${this.alt}>
@@ -279,41 +281,95 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //альтернативная запись (сокращенная)
     //new MenuCard().render(); объект и метод используются на месте, те он нам что то сделает и исчезнет, тк на него нет ссылок
-    //Настройка каждого отдельного элемента, который создадим
-    new MenuCard( //прописываем все в кавычках
-        //если забудем передать 'menu__item' то все равно сайт будет работать, тк мы создали условие в которое установили стандратное значение.
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        '.menu .container',
-        'menu__item',
+
+    const getResourse = async (url) => { //функция Function expression
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`); //для того чтобы ошибка выпала из нашей функции используем оператор throw
+        }
+        return await res.json(); //функция возвращает промис, который трансформируется в формат json
+
+    };
+
+    /*  //Реализация создания карточек с помощью конструктора классов (059 вер 1)
+    getResourse('http://localhost:3000/menu') 
+         .then(data => {
+             data.forEach(({
+                 img,
+                 altimg,
+                 title,
+                 descr,
+                 price
+             }) => { // {img, altimg, title, descr, price} деструктуризировали объект
+                 new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+             });
+         }); */
 
 
-    ).render();
+    //Реализация создания карточек без использования классов (059 вер 2)
+    getResourse('http://localhost:3000/menu')
+        .then(data => createCard(data));
 
-    new MenuCard( //прописываем все в кавычках
-        "img/tabs/elite.jpg",
-        "elite",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        14,
-        '.menu .container',
-        'menu__item'
+    function createCard(data) { //функция createCard получает данные (массив), далее перебираем их и деструктуризируем объекты на отдельные свойства, далее создаем новый div, добавляем ему новый класс, формируем верстку и внутрь помещаем свойства которые пришли с сервера и вставляем (аппендим) карточку на страницу.
+        data.forEach(({
+            img,
+            altimg,
+            title,
+            descr,
+            price
+        }) => {
+            const element = document.createElement('div');
+            element.classList.add('menu__item');
+            element.innerHTML = `
+            <img src=${img} alt=${altimg}>
+            <h3 class="menu__item-subtitle">${title}</h3>
+            <div class="menu__item-descr">${descr}</div>
+            <div class="menu__item-divider"></div>
+            <div class="menu__item-price">
+                <div class="menu__item-cost">Цена:</div>
+                <div class="menu__item-total"><span>${price}</span> грн/день</div> 
+            </div>
+            `;
+            document.querySelector('.menu .container').append(element);
+        });
+    }
 
-    ).render();
+    /* //Не нужно для 059, тк данные получаем с сервера
+        //Настройка каждого отдельного элемента, который создадим
+        new MenuCard( //прописываем все в кавычках
+            //если забудем передать 'menu__item' то все равно сайт будет работать, тк мы создали условие в которое установили стандратное значение.
+            "img/tabs/vegy.jpg",
+            "vegy",
+            'Меню "Фитнес"',
+            'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+            9,
+            '.menu .container',
+            'menu__item',
 
-    new MenuCard( //прописываем все в кавычках
-        "img/tabs/post.jpg",
-        "post",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        21,
-        '.menu .container',
-        'menu__item'
 
-    ).render();
+        ).render();
+
+        new MenuCard( //прописываем все в кавычках
+            "img/tabs/elite.jpg",
+            "elite",
+            'Меню “Премиум”',
+            'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+            14,
+            '.menu .container',
+            'menu__item'
+
+        ).render();
+
+        new MenuCard( //прописываем все в кавычках
+            "img/tabs/post.jpg",
+            "post",
+            'Меню "Постное"',
+            'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+            21,
+            '.menu .container',
+            'menu__item'
+
+        ).render(); */
 
 
     //после создания карточек через JS, удаляем их из файла html
@@ -329,13 +385,27 @@ window.addEventListener('DOMContentLoaded', () => {
         failure: 'Что то пошло не так...'
     };
 
-    forms.forEach(item => { //под каждую форму подвязываем функцию postDate
-        postData(item);
+    forms.forEach(item => { //под каждую форму подвязываем функцию bindPostData
+        bindPostData(item);
     });
 
+    //059 Получение данных с сервера. Async_await
 
+    //При запуске функции postDate начинает идти запрос и тк указано ключевое слово await браузеру необходимо дождаться результата этого запроса
+    const postDate = async (url, data) => { //функция Function expression. data это то, что мы отправляем на сервер.
+        const res = await fetch(url, { //это асинхронный код, тк мы не знаем через сколько ответит сервер
+            method: 'POST', //настройка каким образом
+            headers: { //для отправки  formData, headers не нужно
+                'Content-type': 'application/json' //ставим не запятую, а двоеточие
+            },
+            body: data //настройка что именно отправлять
+        });
 
-    function postData(form) { //функция постинга данных
+        return await res.json(); //функция возвращает промис, который трансформируется в формат json
+
+    };
+
+    function bindPostData(form) { //привязать постинг данных
         form.addEventListener('submit', (e) => { //событие submit срабатывает каждый раз когда мы пытаемся отправить форму
             //по умолчанию браузер всегда перезагружает страницу при нажатии на клавишу с тегом btn 
             e.preventDefault(); //отмена перезагрузки страницы при нажатии на кнопки Перезвонить мне
@@ -370,36 +440,35 @@ window.addEventListener('DOMContentLoaded', () => {
             //Для сбора информации с форм с помощью formData, 
             //необходимо чтобы у форм в верстке был всегда атбрибут name
 
-            /*  Не нужно для Fetch 056
-                   //Превращение объекта formData в формат JSON
-                   //formData специфический объект и просто так мы не можем его прогнать в другой формат
-                   const object ={}; 
-                   formData.forEach(function(value, key){ //перебор formData и помещение данных в object
-                       object[key] = value;
-                   });
-                   //На данном этапе получили обычный объект (object), а не formData
-                   const json = JSON.stringify(object);  //превращение объекта в JSON  */
+
+            //Превращение объекта formData в формат JSON Не нужно для 059, заменили другим.
+            //formData специфический объект и просто так мы не можем его прогнать в другой формат
+            /*  const object = {};
+             formData.forEach(function (value, key) { //перебор formData и помещение данных в object
+                 object[key] = value;
+             }); */
+            //На данном этапе получили обычный объект (object), а не formData
+            //const json = JSON.stringify(object); //превращение объекта в JSON 
+
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
+            //formData собрала все данные с формы, мы ее превращаем в массив массивов, после этого превращаем в классический объект, а после этого классический объект превращаем в json.
+
 
             //request.send(formData); //метод для отправки 1)formData
             // Не нужно для Fetch 056: 
             //request.send(json); //2) для JSON
 
-            fetch('server.php', {
-                method: 'POST',
-                /*  headers: {
-                     'Content-type': 'application/json' //ставим не запятую, а двоеточие
-                 }, */
-                body: formData
-            }).then(data => data.text()) //модификация ответа от сервера в обычный текст
-            .then(data => {
-                console.log(data); //вывод в консоль того, что вернул сервер
-                showThanksModal(message.success); //Сообщение об упехе
-                statusMessage.remove();
-            }).catch(() => { //этот блок лучше всегда прописывать, чтобы обрабатывать ошибки
-                showThanksModal(message.failure);
-            }).finally(() => {
-                form.reset(); //Очистка формы
-            });
+            postDate('http://localhost:3000/requests', json)
+                //.then(data => data.text()) //модификация ответа от сервера в обычный текст. Не нужно для 059
+                .then(data => {
+                    console.log(data); //вывод в консоль того, что вернул сервер
+                    showThanksModal(message.success); //Сообщение об упехе
+                    statusMessage.remove();
+                }).catch(() => { //этот блок лучше всегда прописывать, чтобы обрабатывать ошибки
+                    showThanksModal(message.failure);
+                }).finally(() => { // вносится действие которое выполняется всегда
+                    form.reset(); //Очистка формы
+                });
 
             /*     Не нужно для Fetch 056
             request.addEventListener('load', () => {  //load - конечная загрузка запроса
@@ -444,21 +513,47 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 1000);
 
     }
-    /* 
-    //056. Fetch API (application programming interface)
-    Fetch это замена XMLHttpRequest
-    Самый банальный API это DOM API, по факту это различные методы (к примеру querySelector), которые позволяют нам работать с элементами на странице
-    Перепишем наш функционал проекта с использование Fetch.
-    //Fetch технология позволяющая общаться с сервером, построенная на Промисах
-    fetch('https://jsonplaceholder.typicode.com/posts', { //Из этой конструкции возвращается именно Промис. Настройки Fetch идут после url в формате объекта. Если эти настройки не указывать, то это будет обычный GET запрос.
-        method: 'POST',
-        body: JSON.stringify({name: 'Alex'}), //объект который будем отправлять
-        headers: { //заголовки
-               'Content-type': 'application/json'
-        }
-    })
-      .then(response => response.json()) //response - ответ.
-      //response.json() превращает json данные в самый обычный JS объект. Эта команда возвращает нам промис, тк мы не знаем как быстро наш json объект превратится в обычный объект, не знаем точного количества времени. Если все успешно прошло, то выполняется следующий then.
-      .then(json => console.log(json)); */
+
+    /*   //056. Fetch API (application programming interface) интерфейс програмного обеспечения
+      Fetch это замена XMLHttpRequest
+      По - простому это набор данных и возможностей которые предоставляет нам какое то готовое решение.
+      Самый банальный API это DOM API, по факту это различные методы(к примеру querySelector), которые позволяют нам работать с элементами на странице
+      Перепишем наш функционал проекта с использование Fetch.
+      //Fetch технология позволяющая общаться с сервером, построенная на Промисах
+      https://jsonplaceholder.typicode.com/ база данных для тестов
+
+          //Обычный GET запрос
+          fetch('https://jsonplaceholder.typicode.com/todos/1') //возвращается промис
+          .then(response => response.json()) //response - ответ.
+          //response.json() превращает json данные в самый обычный JS объект. Эта команда возвращает нам промис, тк мы не знаем как быстро наш json объект превратится в обычный объект, не знаем точного количества времени. Если все успешно прошло, то выполняется следующий then.
+          .then(json => console.log(json));
+
+
+      //   2 способа запросов на сервер:
+      //   - XMLHttpRequest(XHR)
+      //   - Fetch
+
+
+      //POST запрос
+      fetch('https://jsonplaceholder.typicode.com/posts', { //Из этой конструкции возвращается именно Промис. Настройки Fetch идут после url в формате объекта. Если эти настройки не указывать, то это будет обычный GET запрос.
+              method: 'POST',
+              body: JSON.stringify({
+                  name: 'Alex'
+              }), //объект который будем отправлять, JSON.stringify преобразует строку или объект в JSON данные
+              headers: { //заголовки
+                  'Content-type': 'application/json'
+              }
+          })
+          .then(response => response.json())
+          .then(json => console.log(json));
+
+
+      PUT полное изменение ресурса
+      PATCH частичное изменение ресурса*/
+
+    //058. npm. JSON server
+    fetch('http://localhost:3000/menu') //прописали в терминале команду json-server db.json и после этого получили ссылку
+        .then(data => data.json())
+        .then(res => console.log(res));
 
 });
