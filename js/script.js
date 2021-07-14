@@ -291,24 +291,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
     };
 
-    /*  //Реализация создания карточек с помощью конструктора классов (059 вер 1)
-    getResourse('http://localhost:3000/menu') 
-         .then(data => {
-             data.forEach(({
-                 img,
-                 altimg,
-                 title,
-                 descr,
-                 price
-             }) => { // {img, altimg, title, descr, price} деструктуризировали объект
-                 new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-             });
-         }); */
+    /* //060.Создание карточек с помощью готовых библиотек
+        axios.get('http://localhost:3000/menu')
+            .then(data => {
+                data.data.forEach(({
+                    img,
+                    altimg,
+                    title,
+                    descr,
+                    price
+                }) => { // {img, altimg, title, descr, price} деструктуризировали объект
+                    new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+                });
+            }); */
+
+    //Реализация создания карточек с помощью конструктора классов (059 вер 1)
+    getResourse('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({
+                img,
+                altimg,
+                title,
+                descr,
+                price
+            }) => { // {img, altimg, title, descr, price} деструктуризировали объект
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
 
 
     //Реализация создания карточек без использования классов (059 вер 2)
-    getResourse('http://localhost:3000/menu')
-        .then(data => createCard(data));
+    //getResourse('http://localhost:3000/menu')
+    //   .then(data => createCard(data));
 
     function createCard(data) { //функция createCard получает данные (массив), далее перебираем их и деструктуризируем объекты на отдельные свойства, далее создаем новый div, добавляем ему новый класс, формируем верстку и внутрь помещаем свойства которые пришли с сервера и вставляем (аппендим) карточку на страницу.
         data.forEach(({
@@ -334,7 +348,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* //Не нужно для 059, тк данные получаем с сервера
+    /* //Не нужно для 059, тк данные получаем с сервера.  
         //Настройка каждого отдельного элемента, который создадим
         new MenuCard( //прописываем все в кавычках
             //если забудем передать 'menu__item' то все равно сайт будет работать, тк мы создали условие в которое установили стандратное значение.
@@ -391,9 +405,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //059 Получение данных с сервера. Async_await
 
+    //Async_await превращает асинхронный код в синхронный
     //При запуске функции postDate начинает идти запрос и тк указано ключевое слово await браузеру необходимо дождаться результата этого запроса
+    //Если не прописать Async/await выйдет ошибка на шаге res.json(), тк из fetch ничего не вернулось, а мы будет пытаться обработать результат методом json
+    //async ставится перед функцией
     const postDate = async (url, data) => { //функция Function expression. data это то, что мы отправляем на сервер.
-        const res = await fetch(url, { //это асинхронный код, тк мы не знаем через сколько ответит сервер
+        const res = await fetch(url, { //это асинхронный код, тк мы не знаем через сколько ответит сервер, но тк прописан await JS будет ждать результата зпроса.
             method: 'POST', //настройка каким образом
             headers: { //для отправки  formData, headers не нужно
                 'Content-type': 'application/json' //ставим не запятую, а двоеточие
@@ -401,7 +418,7 @@ window.addEventListener('DOMContentLoaded', () => {
             body: data //настройка что именно отправлять
         });
 
-        return await res.json(); //функция возвращает промис, который трансформируется в формат json
+        return await res.json(); //функция возвращает ответ-промис, который трансформируется в формат json, но тк мы не знаем насколько большой объект и сколько времени займет трансформация следовательно указываем слово await
 
     };
 
@@ -452,6 +469,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
             //formData собрала все данные с формы, мы ее превращаем в массив массивов, после этого превращаем в классический объект, а после этого классический объект превращаем в json.
+            //entries берет каждое свойство из объекта и формирует из него маленький массив
 
 
             //request.send(formData); //метод для отправки 1)formData
@@ -555,5 +573,57 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch('http://localhost:3000/menu') //прописали в терминале команду json-server db.json и после этого получили ссылку
         .then(data => data.json())
         .then(res => console.log(res));
+
+
+
+    //Создание слайдера на сайте. 
+    const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        total = document.querySelector('#total'),
+        current = document.querySelector('#current');
+
+    let slideIndex = 1;
+
+    //061.Создание слайдера на сайте. 1 вариант.
+
+    showSlides(slideIndex);
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    function showSlides(n) {
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+        if (n < 1) { //если при прокрутке слайдов уходим в отрицательную сторону, то просто перемещаемся в конец
+            slideIndex = slides.length;
+        }
+
+        slides.forEach(item => item.style.display = 'none');
+
+        slides[slideIndex - 1].style.display = 'block';
+
+        //   showSlides(slideIndex);
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    }
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    prev.addEventListener('click', () => {
+        plusSlides(-1)
+    });
+
+    next.addEventListener('click', () => {
+        plusSlides(1)
+    });
 
 });
