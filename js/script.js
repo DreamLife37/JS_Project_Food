@@ -576,54 +576,118 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-    //Создание слайдера на сайте. 
+    //061-062.Создание слайдера на сайте. 
     const slides = document.querySelectorAll('.offer__slide'),
         prev = document.querySelector('.offer__slider-prev'),
         next = document.querySelector('.offer__slider-next'),
         total = document.querySelector('#total'),
-        current = document.querySelector('#current');
+        current = document.querySelector('#current'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'), //для 2 вар, главная обертка.
+        slidesField = document.querySelector('.offer__slider-inner'), //для 2 вар, поле с нашими слайдами.
+        width = window.getComputedStyle(slidesWrapper).width; //для 2 вар, ширина отверстия/окошко через которое мы будем видеть наш слайд.
 
     let slideIndex = 1;
 
-    //061.Создание слайдера на сайте. 1 вариант.
-
-    showSlides(slideIndex);
+    //062.Создание слайдера на сайте. 2 вариант.
+    //В файле html обернули слайды еще в один блок <div class="offer__slider-inner">, делается это для того, чтобы главная обертка была как окошко, через которое мы можем видеть текущий слайд
+    let offset = 0; //для смещения слайдов, необходимо установить отступ.
     if (slides.length < 10) {
         total.textContent = `0${slides.length}`;
+        current.textContent = `0${slideIndex}`;
     } else {
         total.textContent = slides.length;
+        current.textContent = slideIndex;
     }
+    slidesField.style.width = 100 * slides.length + '%'; //ширина блока со слайдами
+    slidesField.style.display = 'flex'; //изменяем свойство display, применяем flex чтобы все слайды выстроились в одну полоску
+    slidesField.style.transition = '0.5s all'; //добавляем свойство transition для плавного передвижения слайдов
+    slidesWrapper.style.overflow = 'hidden'; //скрываем все элементы которые не попадают в область видимости
+    slides.forEach(slide => { //берем все слайды, перебираем и каждому слайду установим одинаковую ширину 
+        slide.style.width = width;
+    })
 
-    function showSlides(n) {
-        if (n > slides.length) {
+    next.addEventListener('click', () => {
+        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+            //тк в width лежит строка с px (к примеру 500px), то необходимо отрезать два последних символа. Если наш отступ будет равен ширине одного слайда * на количество слайдов -1, то установить offset в ноль, это означает, что мы долистали до самого конца и нам необходимо вернуться в самое начало
+            offset = 0;
+        } else {
+            offset += +width.slice(0, width.length - 2); //добавляем к отступу ширину еще одного сладйа
+        }
+        slidesField.style.transform = `translateX(-${offset}px`; //трансформация элемента по оси Х, минус означает смещение влево.
+
+        if (slideIndex == slides.length) { //если дошли до конца слайдера, необходимо переместиться в первую позицию
             slideIndex = 1;
+        } else {
+            slideIndex++;
         }
-        if (n < 1) { //если при прокрутке слайдов уходим в отрицательную сторону, то просто перемещаемся в конец
-            slideIndex = slides.length;
-        }
 
-        slides.forEach(item => item.style.display = 'none');
-
-        slides[slideIndex - 1].style.display = 'block';
-
-        //   showSlides(slideIndex);
-        if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`;
+        if (slides.length < 10) { //если слайдов меньше 10, добавляем к индексу ноль 
+            current.textContent = `0${slideIndex}`
         } else {
             current.textContent = slideIndex;
         }
-    }
-
-    function plusSlides(n) {
-        showSlides(slideIndex += n);
-    }
+    })
 
     prev.addEventListener('click', () => {
-        plusSlides(-1)
-    });
+        if (offset == 0) { //здесь мы уже проверяем не последний слайд, как в next, а первый.
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1) //перемещаемся в самый конец. В offset записываем последний слайд.
+        } else {
+            offset -= +width.slice(0, width.length - 2); //отнимаем ширину слайда
+        }
+        slidesField.style.transform = `translateX(-${offset}px`
 
-    next.addEventListener('click', () => {
-        plusSlides(1)
-    });
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        } else {
+            slideIndex--;
+        }
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`
+        } else {
+            current.textContent = slideIndex
+        }
+    })
+    /*   //061.Создание слайдера на сайте. 1 вариант.
+
+      showSlides(slideIndex);
+      if (slides.length < 10) {
+          total.textContent = `0${slides.length}`;
+      } else {
+          total.textContent = slides.length;
+      }
+
+      function showSlides(n) {
+          if (n > slides.length) {
+              slideIndex = 1;
+          }
+          if (n < 1) { //если при прокрутке слайдов уходим в отрицательную сторону, то просто перемещаемся в конец
+              slideIndex = slides.length;
+          }
+
+          slides.forEach(item => item.style.display = 'none');
+
+          slides[slideIndex - 1].style.display = 'block';
+
+          //   showSlides(slideIndex);
+          if (slides.length < 10) {
+              current.textContent = `0${slideIndex}`;
+          } else {
+              current.textContent = slideIndex;
+          }
+      }
+
+      function plusSlides(n) {
+          showSlides(slideIndex += n);
+      }
+
+      prev.addEventListener('click', () => {
+          plusSlides(-1)
+      });
+
+      next.addEventListener('click', () => {
+          plusSlides(1)
+      }); */
+
 
 });
