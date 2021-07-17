@@ -578,6 +578,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //061-062.Создание слайдера на сайте. 
     const slides = document.querySelectorAll('.offer__slide'),
+        slider = document.querySelector('.offer__slider'), //для 063
         prev = document.querySelector('.offer__slider-prev'),
         next = document.querySelector('.offer__slider-next'),
         total = document.querySelector('#total'),
@@ -606,6 +607,50 @@ window.addEventListener('DOMContentLoaded', () => {
         slide.style.width = width;
     })
 
+    //063.Создание навигации по слайдам
+    slider.style.position = 'relative';
+    const indicators = document.createElement('ol'), //создали элемент с тегом ol (ordered list - упорядоченный список), а внутри каждый элемент li
+        dots = [];
+    indicators.classList.add('carousel-indicators');
+    indicators.style.cssText = `
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 15;
+        display: flex;
+        justify-content: center;
+        margin-right: 15%;
+        margin-left: 15%;
+        list-style: none;
+        `;
+    slider.append(indicators);
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement('li'); //создаем элемент точки с тегом li
+        dot.setAttribute('data-slide-to', i + 1); //установить каждой точке атрибут и нумерацию начиная с единицы
+        dot.style.cssText = `
+            box-sizing: content-box;
+            flex: 0 1 auto;
+            width: 30px;
+            height: 6px;
+            margin-right: 3px;
+            margin-left: 3px;
+            cursor: pointer;
+            background-color: #fff;
+            background-clip: padding-box;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            opacity: .5;
+            transition: opacity .6s ease;
+            `;
+
+        if (i == 0) {
+            dot.style.opacity = 1; //подсветка текущего индикатора слайдов
+        }
+
+        indicators.append(dot);
+        dots.push(dot); //поместили точку в массив
+    }
     next.addEventListener('click', () => {
         if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
             //тк в width лежит строка с px (к примеру 500px), то необходимо отрезать два последних символа. Если наш отступ будет равен ширине одного слайда * на количество слайдов -1, то установить offset в ноль, это означает, что мы долистали до самого конца и нам необходимо вернуться в самое начало
@@ -621,12 +666,16 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex++;
         }
 
-        if (slides.length < 10) { //если слайдов меньше 10, добавляем к индексу ноль 
+       /*  if (slides.length < 10) { 
             current.textContent = `0${slideIndex}`
         } else {
             current.textContent = slideIndex;
         }
-    })
+        dots.forEach(dot => dot.style.opacity = '.5'); //для 063
+        dots[slideIndex - 1].style.opacity = 1; //для 063 */
+        setOpacity();
+        addZero();
+    });
 
     prev.addEventListener('click', () => {
         if (offset == 0) { //здесь мы уже проверяем не последний слайд, как в next, а первый.
@@ -642,12 +691,52 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex--;
         }
 
+        /* if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`
+        } else {
+            current.textContent = slideIndex
+        }
+
+        //063
+    
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[slideIndex - 1].style.opacity = 1; */
+        setOpacity();
+        addZero();
+    })
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            const slideTo = e.target.getAttribute('data-slide-to');
+            slideIndex = slideTo;
+            offset = +width.slice(0, width.length - 2) * (slideTo - 1)
+            slidesField.style.transform = `translateX(-${offset}px`
+
+            /*   if (slides.length < 10) {
+                  current.textContent = `0${slideIndex}`
+              } else {
+                  current.textContent = slideIndex
+              }
+              
+              dots.forEach(dot => dot.style.opacity = '.5');
+              dots[slideIndex - 1].style.opacity = 1; */
+            setOpacity();
+            addZero();
+        });
+    });
+
+    function setOpacity() {
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[slideIndex - 1].style.opacity = 1; //подсветка точки активного слайда
+    }
+
+    function addZero() { //если слайдов меньше 10, добавляем к индексу ноль 
         if (slides.length < 10) {
             current.textContent = `0${slideIndex}`
         } else {
             current.textContent = slideIndex
         }
-    })
+    }
+
     /*   //061.Создание слайдера на сайте. 1 вариант.
 
       showSlides(slideIndex);
