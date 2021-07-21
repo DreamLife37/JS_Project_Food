@@ -652,11 +652,11 @@ window.addEventListener('DOMContentLoaded', () => {
         dots.push(dot); //поместили точку в массив
     }
     next.addEventListener('click', () => {
-        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+        if (offset == deleteNoDigits(width) * (slides.length - 1)) {
             //тк в width лежит строка с px (к примеру 500px), то необходимо отрезать два последних символа. Если наш отступ будет равен ширине одного слайда * на количество слайдов -1, то установить offset в ноль, это означает, что мы долистали до самого конца и нам необходимо вернуться в самое начало
             offset = 0;
         } else {
-            offset += +width.slice(0, width.length - 2); //добавляем к отступу ширину еще одного сладйа
+            offset += deleteNoDigits(width); //добавляем к отступу ширину еще одного сладйа
         }
         slidesField.style.transform = `translateX(-${offset}px`; //трансформация элемента по оси Х, минус означает смещение влево.
 
@@ -666,22 +666,22 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex++;
         }
 
-       /*  if (slides.length < 10) { 
-            current.textContent = `0${slideIndex}`
-        } else {
-            current.textContent = slideIndex;
-        }
-        dots.forEach(dot => dot.style.opacity = '.5'); //для 063
-        dots[slideIndex - 1].style.opacity = 1; //для 063 */
+        /*  if (slides.length < 10) { 
+             current.textContent = `0${slideIndex}`
+         } else {
+             current.textContent = slideIndex;
+         }
+         dots.forEach(dot => dot.style.opacity = '.5'); //для 063
+         dots[slideIndex - 1].style.opacity = 1; //для 063 */
         setOpacity();
         addZero();
     });
 
     prev.addEventListener('click', () => {
         if (offset == 0) { //здесь мы уже проверяем не последний слайд, как в next, а первый.
-            offset = +width.slice(0, width.length - 2) * (slides.length - 1) //перемещаемся в самый конец. В offset записываем последний слайд.
+            offset = deleteNoDigits(width) * (slides.length - 1) //перемещаемся в самый конец. В offset записываем последний слайд.
         } else {
-            offset -= +width.slice(0, width.length - 2); //отнимаем ширину слайда
+            offset -= deleteNoDigits(width); //отнимаем ширину слайда
         }
         slidesField.style.transform = `translateX(-${offset}px`
 
@@ -708,7 +708,7 @@ window.addEventListener('DOMContentLoaded', () => {
         dot.addEventListener('click', (e) => {
             const slideTo = e.target.getAttribute('data-slide-to');
             slideIndex = slideTo;
-            offset = +width.slice(0, width.length - 2) * (slideTo - 1)
+            offset = deleteNoDigits(width) * (slideTo - 1)
             slidesField.style.transform = `translateX(-${offset}px`
 
             /*   if (slides.length < 10) {
@@ -735,6 +735,10 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             current.textContent = slideIndex
         }
+    }
+
+    function deleteNoDigits(str) {
+        return +str.replace(/\D/g, '')
     }
 
     /*   //061.Создание слайдера на сайте. 1 вариант.
