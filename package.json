@@ -2,13 +2,19 @@
   "name": "food",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack -p",
+    "watch": "webpack --watch"
   },
+   
+
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "json-server": "^0.16.3"
+    "json-server": "^0.16.3",
+    "webpack": "^5.47.1",
+    "webpack-cli": "^4.7.2"
   }
 }
