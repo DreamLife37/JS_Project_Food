@@ -1,12 +1,12 @@
-function tabs() {
+function tabs(tabsSelector, tabsContentSelector, tabsParentSelector, activeClass) {
     //Tabs
     /*  3 задачи:
      1)Функция которая будет скрывать ненужные нам табы
      2)Функция показа нужного Таба
      3)Назначить обработчик события на меню */
-    const tabs = document.querySelectorAll('.tabheader__item'), //получение всех вкладок на которые будем кликать, тк класс ставим точку
-        tabsContent = document.querySelectorAll('.tabcontent'), //получение класса отвечающего за контент
-        tabsParent = document.querySelector('.tabheader__items'); //родитель который будет содержать все табы/вкладки
+    const tabs = document.querySelectorAll(tabsSelector), //получение всех вкладок на которые будем кликать, тк класс ставим точку
+        tabsContent = document.querySelectorAll(tabsContentSelector), //получение класса отвечающего за контент
+        tabsParent = document.querySelector(tabsParentSelector); //родитель который будет содержать все табы/вкладки
 
     /* В реальных проектах чаще всего используют классы вместо inline стилей, исправим программу под это. В CSS добавили следующий код, для анимации и скрытия и показа вкладок, те используем класс вместо inline стилей
     .show{display:block}.hide{display:none}.fade{animation-name: fade;animation-duration: 1.5s;}@keyframes fade{from{opacity: 0.1;}to{opacity: 1;}}
@@ -19,7 +19,7 @@ function tabs() {
             item.classList.remove('show', 'fade'); //удалить класс show с анимацией
         });
         tabs.forEach(item => {
-            item.classList.remove('tabheader__item_active'); //удалить у каждого элемента Таба класс активности, тк мы работаем с классами, команда classList, то точку не ставим.
+            item.classList.remove(activeClass); //удалить у каждого элемента Таба класс активности, тк мы работаем с классами, команда classList, то точку не ставим.
         });
     }
 
@@ -27,7 +27,7 @@ function tabs() {
         //tabsContent[i].style.display = 'block'; используем inline стили, эту строку заменили на две нижестоящие.
         tabsContent[i].classList.add('show', 'fade'); //вместо inline стилей используем классы. Добавляем класс show с анимацией
         tabsContent[i].classList.remove('hide');
-        tabs[i].classList.add('tabheader__item_active');
+        tabs[i].classList.add(activeClass);
     }
 
     hideTabContent();
@@ -36,7 +36,8 @@ function tabs() {
     //Используем делигирование событий
     tabsParent.addEventListener('click', (event) => {
         const target = event.target; //необязательное, но желательное действие, можно было обращаться к event.target
-        if (target && target.classList.contains('tabheader__item')) {
+        //073.тк в classList используется значение без точки, те ее необходимо убрать
+        if (target && target.classList.contains(tabsSelector.slice(1))) { 
             tabs.forEach((item, i) => {
                 /*  мы переберем все табы которые лежат в переменной tabs и будем сравнивать
                            если элемент который находится в этом псевдомассиве совпадает с элементом который кликнул пользователь, тогда мы берем его номер и показываем на странице 
@@ -52,4 +53,4 @@ function tabs() {
 
 }
 
-module.exports = tabs;
+export default tabs;

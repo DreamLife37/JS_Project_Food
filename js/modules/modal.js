@@ -1,4 +1,25 @@
-function modal() {
+//closeModal и openModal вынесли из modal, тк эти функции используются еще и в других модулях (forms.js).
+function closeModal(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+    modal.classList.add('hide');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function openModal(modalSelector, modalTimerId) {
+    const modal = document.querySelector(modalSelector);
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    document.body.style.overflow = 'hidden';
+
+    console.log(modalTimerId);
+    if (modalTimerId) { //запускать clearInterval только если был передан modalTimerId
+        clearInterval(modalTimerId);
+    }
+    
+}
+
+function modal(triggerSelector, modalSelector, modalTimerId) {
         //Modal
     /*     Первым делом необходимо в HTML найти кнопки/триггеры которые будут вызывать модальное окно,
         они могут иметь разные классы, теги и чтобы их как то объединить, пометить им назначают data атрибуты
@@ -7,8 +28,8 @@ function modal() {
          <div data-close class="modal__close">&times;</div> */
 
     //Триггер для модального окна это будет кнопка "Связаться с Нами"
-    const modalTrigger = document.querySelectorAll('[data-modal]'), //атрибут прописывается в квадратных скобках. Находим кнопки.
-        modal = document.querySelector('.modal'); //переменная отвечающая за само модальное окно
+    const modalTrigger = document.querySelectorAll(triggerSelector), //атрибут прописывается в квадратных скобках. Находим кнопки.
+        modal = document.querySelector(modalSelector); //переменная отвечающая за само модальное окно
     //После создания мод. модального окна в 054, обработчик события работать с таким элементами не будет,
     //тк элемент создан динамически с помощью JS. Удаляем переменную modalCloseBtn
     //  modalCloseBtn = document.querySelector('[data-close]'); //кнопка отвечающая за закрытие окна
@@ -29,21 +50,10 @@ function modal() {
 
 
     modalTrigger.forEach(btn => {
-        btn.addEventListener('click', openModal);
-    });
+        btn.addEventListener('click', () => openModal(modalSelector, modalTimerId));
+    }); //если не добавить стрелочную функцию, то openModal(modalSelector) вызовется сразу, а так делать нельзя. 
 
-    function closeModal() {
-        modal.classList.add('hide');
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-    }
-
-    function openModal() {
-        modal.classList.add('show');
-        modal.classList.remove('hide');
-        document.body.style.overflow = 'hidden';
-        clearInterval(modalTimerId);
-    }
+  
 
     /* 
         // второй способ вызова модального окна, с помощью переключения класса:
@@ -73,21 +83,21 @@ function modal() {
         if (e.target === modal || e.target.getAttribute('data-close') == '') { //при клике в подложку (modal) окно также закрывается
             //e.target === modal - клик на подложку
             //e.target.getAttribute('data-close') - клик на крести в окне
-            closeModal(); // в данном случае пишем со скобками, те условие выполнилось, функция выполняется
+            closeModal(modalSelector); // в данном случае пишем со скобками, те условие выполнилось, функция выполняется
         }
     });
 
     document.addEventListener('keydown', (e) => { //при нажатии на кнопку ESC окно также закрывается
         //кода кнопок можно посмотреть на сайте https://keycode.info/
         if (e.code === "Escape" && modal.classList.contains('show')) { //чтобы каждый раз при нажатии на ESC не вызывалась функция прописываем условие, что вызвать только когда модальное окно показано
-            closeModal();
+            closeModal(modalSelector);
         }
     });
 
     //044 Модификации модального окна. 
     //Всплытие окна при долистывании страницы до конца и при прошестви некоторого времени
 
-    const modalTimerId = setTimeout(openModal, 60000); //через 6 сек откроется модальное окно, если он ранее его не открывал
+    
 
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
@@ -95,11 +105,13 @@ function modal() {
             //свойство pageYOffset отслеживает сколько px отлистал поль-ль по оси Y (прокрученная часть)
             //свойство scrollHeight получение полной высоты элемента с учетом прокрутки которая была сверху
             //clientHeight высота клиента, те видимой части окна
-            openModal();
+            openModal(modalSelector, modalTimerId);
             window.removeEventListener('scroll', showModalByScroll); //как только пол-ль долистал один раз старцницу до конца, всплывет модальное окно и все, больше всплывать не будет.
         }
     }
     window.addEventListener('scroll', showModalByScroll); //при долистывании страницы до конца появляется модальное окно
 }
 
-module.exports = modal;
+export default modal;
+export {closeModal};
+export {openModal};

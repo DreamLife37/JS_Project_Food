@@ -1,8 +1,10 @@
-function forms() {
+import {closeModal, openModal} from './modal';
+import {postData} from '../services/services';
+function forms(formSelector, modalTimerId) {
     
     //053 Forms. Реализация скрипта отправки данных на сервер с использование объекта XMLHttpRequest
     // Сначала создаем файл backEnd - server.php
-    const forms = document.querySelectorAll('form'); //получение всех форм по тегу "form"
+    const forms = document.querySelectorAll(formSelector); //получение всех форм по тегу "form"
     const message = { //создаем объект с различными свойствами - сообщениями
         //loading: 'Загрузка',
         loading: 'img/form/spinner.svg',
@@ -17,21 +19,11 @@ function forms() {
     //059 Получение данных с сервера. Async_await
 
     //Async_await превращает асинхронный код в синхронный
-    //При запуске функции postDate начинает идти запрос и тк указано ключевое слово await браузеру необходимо дождаться результата этого запроса
+    //При запуске функции postData начинает идти запрос и тк указано ключевое слово await браузеру необходимо дождаться результата этого запроса
     //Если не прописать Async/await выйдет ошибка на шаге res.json(), тк из fetch ничего не вернулось, а мы будет пытаться обработать результат методом json
     //async ставится перед функцией
-    const postDate = async (url, data) => { //функция Function expression. data это то, что мы отправляем на сервер.
-        const res = await fetch(url, { //это асинхронный код, тк мы не знаем через сколько ответит сервер, но тк прописан await JS будет ждать результата зпроса.
-            method: 'POST', //настройка каким образом
-            headers: { //для отправки  formData, headers не нужно
-                'Content-type': 'application/json' //ставим не запятую, а двоеточие
-            },
-            body: data //настройка что именно отправлять
-        });
 
-        return await res.json(); //функция возвращает ответ-промис, который трансформируется в формат json, но тк мы не знаем насколько большой объект и сколько времени займет трансформация следовательно указываем слово await
-
-    };
+    //073.Функцию postData вынесли в отдельный файл services, тк она работает с сервером и может также пригодится в других местах
 
     function bindPostData(form) { //привязать постинг данных
         form.addEventListener('submit', (e) => { //событие submit срабатывает каждый раз когда мы пытаемся отправить форму
@@ -47,7 +39,6 @@ function forms() {
         `;
             //form.append(statusMessage); //добавить к форме текстовое поле
             form.insertAdjacentElement('afterend', statusMessage);
-
 
             /* Не неужно для Fetch (056)
             const request = new XMLHttpRequest(); //создание объекта XMLHttpRequest
@@ -68,7 +59,6 @@ function forms() {
             //Для сбора информации с форм с помощью formData, 
             //необходимо чтобы у форм в верстке был всегда атбрибут name
 
-
             //Превращение объекта formData в формат JSON Не нужно для 059, заменили другим.
             //formData специфический объект и просто так мы не можем его прогнать в другой формат
             /*  const object = {};
@@ -87,7 +77,7 @@ function forms() {
             // Не нужно для Fetch 056: 
             //request.send(json); //2) для JSON
 
-            postDate('http://localhost:3000/requests', json)
+            postData('http://localhost:3000/requests', json)
                 //.then(data => data.text()) //модификация ответа от сервера в обычный текст. Не нужно для 059
                 .then(data => {
                     console.log(data); //вывод в консоль того, что вернул сервер
@@ -121,7 +111,7 @@ function forms() {
         const prevModalDialog = document.querySelector('.modal__dialog'); //находим модальное окно
 
         prevModalDialog.classList.add('hide'); //скрытие модального окна с контентом
-        openModal(); //открытие модального окна
+        openModal('.modal', modalTimerId); //открытие модального окна
 
         const thanksModal = document.createElement('div');
         thanksModal.classList.add('modal__dialog'); //добавление класса новому окну, чтобы он нормально выглядел
@@ -138,7 +128,7 @@ function forms() {
             thanksModal.remove(); //удалить окно с благодарностью
             prevModalDialog.classList.add('show');
             prevModalDialog.classList.remove('hide');
-            closeModal();
+            closeModal('.modal');
         }, 1000);
 
     }
@@ -157,11 +147,9 @@ function forms() {
           //response.json() превращает json данные в самый обычный JS объект. Эта команда возвращает нам промис, тк мы не знаем как быстро наш json объект превратится в обычный объект, не знаем точного количества времени. Если все успешно прошло, то выполняется следующий then.
           .then(json => console.log(json));
 
-
       //   2 способа запросов на сервер:
       //   - XMLHttpRequest(XHR)
       //   - Fetch
-
 
       //POST запрос
       fetch('https://jsonplaceholder.typicode.com/posts', { //Из этой конструкции возвращается именно Промис. Настройки Fetch идут после url в формате объекта. Если эти настройки не указывать, то это будет обычный GET запрос.
@@ -186,4 +174,4 @@ function forms() {
         .then(res => console.log(res));
 }
 
-module.exports = forms;
+export default forms;

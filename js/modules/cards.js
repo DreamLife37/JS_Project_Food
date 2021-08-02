@@ -1,3 +1,5 @@
+import {getResourse} from '../services/services';
+
 function cards() {
     //Задание 048. Используем классы для карточек
 
@@ -66,14 +68,7 @@ function cards() {
     //альтернативная запись (сокращенная)
     //new MenuCard().render(); объект и метод используются на месте, те он нам что то сделает и исчезнет, тк на него нет ссылок
 
-    const getResourse = async (url) => { //функция Function expression
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`); //для того чтобы ошибка выпала из нашей функции используем оператор throw
-        }
-        return await res.json(); //функция возвращает промис, который трансформируется в формат json
-
-    };
+    //Функцию getResourse вынесли в отдельный файл services тк она работает с сервером и может также пригодится в других местах
 
     /* //060.Создание карточек с помощью готовых библиотек
         axios.get('http://localhost:3000/menu')
@@ -173,4 +168,4 @@ function cards() {
     //после создания карточек через JS, удаляем их из файла html
 }
 
-module.exports = cards;
+export default cards;

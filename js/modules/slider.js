@@ -1,15 +1,16 @@
-function slider() {
-        //061-062.Создание слайдера на сайте. 
-        const slides = document.querySelectorAll('.offer__slide'),
-        slider = document.querySelector('.offer__slider'), //для 063
-        prev = document.querySelector('.offer__slider-prev'),
-        next = document.querySelector('.offer__slider-next'),
-        total = document.querySelector('#total'),
-        current = document.querySelector('#current'),
-        slidesWrapper = document.querySelector('.offer__slider-wrapper'), //для 2 вар, главная обертка.
-        slidesField = document.querySelector('.offer__slider-inner'), //для 2 вар, поле с нашими слайдами.
-        width = window.getComputedStyle(slidesWrapper).width; //для 2 вар, ширина отверстия/окошко через которое мы будем видеть наш слайд.
+function slider({container, slide, nextArrow, prevArrow, totalCounter, currentCounter, wrapper, field}) { //073.используем деструктуризацию
 
+        //061-062.Создание слайдера на сайте. 
+        const slides = document.querySelectorAll(slide),
+        slider = document.querySelector(container), //для 063
+        prev = document.querySelector(prevArrow),
+        next = document.querySelector(nextArrow),
+        total = document.querySelector(totalCounter),
+        current = document.querySelector(currentCounter),
+        slidesWrapper = document.querySelector(wrapper), //для 2 вар, главная обертка.
+        width = window.getComputedStyle(slidesWrapper).width, //для 2 вар, ширина отверстия/окошко через которое мы будем видеть наш слайд.
+        slidesField = document.querySelector(field); //для 2 вар, поле с нашими слайдами.
+       
     let slideIndex = 1;
 
     //062.Создание слайдера на сайте. 2 вариант.
@@ -131,17 +132,17 @@ function slider() {
         dot.addEventListener('click', (e) => {
             const slideTo = e.target.getAttribute('data-slide-to');
             slideIndex = slideTo;
-            offset = deleteNoDigits(width) * (slideTo - 1)
-            slidesField.style.transform = `translateX(-${offset}px`
+            offset = deleteNoDigits(width) * (slideTo - 1);
+            slidesField.style.transform = `translateX(-${offset}px`;
 
-            /*   if (slides.length < 10) {
-                  current.textContent = `0${slideIndex}`
+              /*  if (slides.length < 10) {
+                  current.textContent = `0${slideIndex}`;
               } else {
-                  current.textContent = slideIndex
+                  current.textContent = slideIndex;
               }
               
               dots.forEach(dot => dot.style.opacity = '.5');
-              dots[slideIndex - 1].style.opacity = 1; */
+              dots[slideIndex - 1].style.opacity = 1;  */
             setOpacity();
             addZero();
         });
@@ -154,9 +155,9 @@ function slider() {
 
     function addZero() { //если слайдов меньше 10, добавляем к индексу ноль 
         if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`
+            current.textContent = `0${slideIndex}`;
         } else {
-            current.textContent = slideIndex
+            current.textContent = slideIndex;
         }
     }
 
@@ -207,4 +208,4 @@ function slider() {
 
 }
 
-module.exports = slider;
+export default slider;
