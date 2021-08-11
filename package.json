@@ -8,13 +8,23 @@
     "build": "webpack -p",
     "watch": "webpack --watch"
   },
-   
-
   "author": "",
   "license": "ISC",
+  "browsersList": [
+    "> 1%"
+  ],
   "devDependencies": {
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "babel-loader": "^8.2.2",
+    "core-js": "^3.16.1",
     "json-server": "^0.16.3",
     "webpack": "^5.47.1",
     "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "es6-promise": "^4.2.8",
+    "nodelist-foreach-polyfill": "^1.2.0"
   }
 }
